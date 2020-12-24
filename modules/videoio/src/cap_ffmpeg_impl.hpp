@@ -923,6 +923,7 @@ bool CvCapture_FFMPEG::open( const char* _filename )
         //by liuziangexit
         //disable parallel encoding
         enc->thread_count = 1;
+        fprintf(stdout, "OpenCV: FFMPEG: disabled multi-threading\n");
 
         AVDictionaryEntry* avdiscard_entry = av_dict_get(dict, "avdiscard", NULL, 0);
 
@@ -1722,6 +1723,9 @@ static AVStream *icv_add_video_stream_FFMPEG(AVFormatContext *oc,
     //use omx
     if (c->codec_id == AV_CODEC_ID_H264) {
       codec = avcodec_find_encoder_by_name(H264_OMX);
+      if(!codec) {
+        fprintf(stdout, "OpenCV: FFMPEG: H264_OMX encoder not found\n");
+      }
     } else {
       codec = avcodec_find_encoder(c->codec_id);
     }
@@ -2357,6 +2361,9 @@ bool CvVideoWriter_FFMPEG::open( const char * filename, int fourcc,
     AVCodec* codec;
     if (c->codec_id == AV_CODEC_ID_H264) {
       codec = avcodec_find_encoder_by_name(H264_OMX);
+      if(!codec) {
+        fprintf(stdout, "OpenCV: FFMPEG: H264_OMX encoder not found\n");
+      }
     } else {
       codec = avcodec_find_encoder(c->codec_id);
     }
@@ -2374,6 +2381,7 @@ bool CvVideoWriter_FFMPEG::open( const char * filename, int fourcc,
     //by liuziangexit
     // disable parallel encoding
     c->thread_count = 1;
+    fprintf(stdout, "OpenCV: FFMPEG: disabled multi-threading\n");
 
     /* open the codec */
     if ((err= avcodec_open2(c, codec, NULL)) < 0) {
