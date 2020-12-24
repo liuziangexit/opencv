@@ -1718,7 +1718,13 @@ static AVStream *icv_add_video_stream_FFMPEG(AVFormatContext *oc,
     }
 
     //if(codec_tag) c->codec_tag=codec_tag;
-    codec = avcodec_find_encoder(c->codec_id);
+    //add by liuziangexit
+    //use omx
+    if (c->codec_id == AV_CODEC_ID_H264) {
+      codec = avcodec_find_encoder_by_name(H264_OMX);
+    } else {
+      codec = avcodec_find_encoder(c->codec_id);
+    }
 
     c->codec_type = AVMEDIA_TYPE_VIDEO;
 
@@ -1792,13 +1798,14 @@ static AVStream *icv_add_video_stream_FFMPEG(AVFormatContext *oc,
      and qmin since they will be set to reasonable defaults by the libx264
      preset system. Also, use a crf encode with the default quality rating,
      this seems easier than finding an appropriate default bitrate. */
+    /*
     if (c->codec_id == AV_CODEC_ID_H264) {
       c->gop_size = -1;
       c->qmin = -1;
       c->bit_rate = 0;
       if (c->priv_data)
           av_opt_set(c->priv_data,"crf","23", 0);
-    }
+    }*/
 
     // some formats want stream headers to be separate
     if(oc->oformat->flags & AVFMT_GLOBALHEADER)
@@ -2344,7 +2351,15 @@ bool CvVideoWriter_FFMPEG::open( const char * filename, int fourcc,
 
     c->codec_tag = fourcc;
     /* find the video encoder */
-    AVCodec* codec = avcodec_find_encoder(c->codec_id);
+    //by liuziangexit
+    //use omx
+    //AVCodec* codec = avcodec_find_encoder(c->codec_id);
+    AVCodec* codec;
+    if (c->codec_id == AV_CODEC_ID_H264) {
+      codec = avcodec_find_encoder_by_name(H264_OMX);
+    } else {
+      codec = avcodec_find_encoder(c->codec_id);
+    }
     if (!codec) {
         fprintf(stderr, "Could not find encoder for codec id %d: %s\n", c->codec_id,
                 icvFFMPEGErrStr(AVERROR_ENCODER_NOT_FOUND));
