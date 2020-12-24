@@ -918,11 +918,10 @@ bool CvCapture_FFMPEG::open( const char* _filename )
     {
         AVCodecContext* enc = ic->streams[i]->codec;
 
-//#ifdef FF_API_THREAD_INIT
-//        avcodec_thread_init(enc, get_number_of_cpus());
-//#else
-        enc->thread_count = get_number_of_cpus();
-//#endif
+//        enc->thread_count = get_number_of_cpus();
+        //by liuziangexit
+        //disable parallel encoding
+        enc->thread_count = 1;
 
         AVDictionaryEntry* avdiscard_entry = av_dict_get(dict, "avdiscard", NULL, 0);
 
@@ -2356,6 +2355,9 @@ bool CvVideoWriter_FFMPEG::open( const char * filename, int fourcc,
     lbit_rate = std::min(lbit_rate, (int64_t)INT_MAX);
     c->bit_rate_tolerance = (int)lbit_rate;
     c->bit_rate = (int)lbit_rate;
+    //by liuziangexit
+    // disable parallel encoding
+    enc->thread_count = 1;
 
     /* open the codec */
     if ((err= avcodec_open2(c, codec, NULL)) < 0) {
