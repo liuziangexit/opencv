@@ -322,6 +322,7 @@ static int get_number_of_cpus(void)
 #endif
 }
 
+#define H264_OMX "h264_omx"
 
 struct Image_FFMPEG
 {
@@ -2357,7 +2358,7 @@ bool CvVideoWriter_FFMPEG::open( const char * filename, int fourcc,
     c->bit_rate = (int)lbit_rate;
     //by liuziangexit
     // disable parallel encoding
-    enc->thread_count = 1;
+    c->thread_count = 1;
 
     /* open the codec */
     if ((err= avcodec_open2(c, codec, NULL)) < 0) {
