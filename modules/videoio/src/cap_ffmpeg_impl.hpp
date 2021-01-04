@@ -512,7 +512,7 @@ struct CvCapture_FFMPEG {
 };
 
 void CvCapture_FFMPEG::init() {
-  fprintf(stderr, "OpenCV: FFMPEG: liuziang 20210104\n");
+  fprintf(stderr, "OpenCV: FFMPEG CAP: liuziang 20210104\n");
   fps = -1;
   ic = 0;
   video_stream = -1;
@@ -1576,6 +1576,7 @@ enum CV_CODEC_ID codec_get_bmp_id(unsigned int tag);
 }
 
 void CvVideoWriter_FFMPEG::init() {
+  fprintf(stderr, "OpenCV: FFMPEG WRT: liuziang 20210104\n");
   fmt = 0;
   oc = 0;
   outbuf = 0;
