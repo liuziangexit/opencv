@@ -867,7 +867,7 @@ bool CvCapture_FFMPEG::open(const char *_filename) {
   // by liuziangexit
   // setting fps
   if (fps != -1) {
-    av_dict_set(dict, "framerate", std::to_string(fps).c_str(), 0);
+    av_dict_set(&dict, "framerate", std::to_string(fps).c_str(), 0);
   }
 
   AVInputFormat *input_format = NULL;
