@@ -57,6 +57,7 @@ using namespace cv;
 #include <algorithm>
 #include <assert.h>
 #include <limits>
+#include <string>
 
 #ifndef __OPENCV_BUILD
 #define CV_FOURCC(c1, c2, c3, c4)                                              \
@@ -463,6 +464,9 @@ struct CvCapture_FFMPEG {
   double dts_to_sec(int64_t dts) const;
   void get_rotation_angle();
 
+  // by liuziangexit
+  int fps;
+
   AVFormatContext *ic;
   AVCodec *avcodec;
   int video_stream;
@@ -508,6 +512,8 @@ struct CvCapture_FFMPEG {
 };
 
 void CvCapture_FFMPEG::init() {
+  fprintf(stderr, "OpenCV: FFMPEG: liuziang 20210104\n");
+  fps = -1;
   ic = 0;
   video_stream = -1;
   video_st = 0;
@@ -857,6 +863,13 @@ bool CvCapture_FFMPEG::open(const char *_filename) {
 #else
   av_dict_set(&dict, "rtsp_transport", "tcp", 0);
 #endif
+
+  // by liuziangexit
+  // setting fps
+  if (fps != -1) {
+    av_dict_set(dict, "framerate", std::to_string(fps).c_str(), 0);
+  }
+
   AVInputFormat *input_format = NULL;
   AVDictionaryEntry *entry = av_dict_get(dict, "input_format", NULL, 0);
   if (entry != 0) {
@@ -1445,6 +1458,9 @@ bool CvCapture_FFMPEG::setProperty(int property_id, double value) {
     return false;
 
   switch (property_id) {
+  case CAP_PROP_FPS: {
+    this->fps = (int)value;
+  } break;
   case CAP_PROP_POS_MSEC:
   case CAP_PROP_POS_FRAMES:
   case CAP_PROP_POS_AVI_RATIO: {
