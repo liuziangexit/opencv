@@ -1259,6 +1259,10 @@ bool CvCapture_FFMPEG::retrieveFrame(int, unsigned char **data, int *step,
 }
 
 double CvCapture_FFMPEG::getProperty(int property_id) const {
+  if (property_id == CAP_PROP_FPS && this->fps != -1) {
+    return this->fps;
+  }
+
   if (!video_st)
     return 0;
 
@@ -1454,13 +1458,15 @@ void CvCapture_FFMPEG::seek(double sec) {
 }
 
 bool CvCapture_FFMPEG::setProperty(int property_id, double value) {
+  if (property_id == CAP_PROP_FPS) {
+    this->fps = (int)value;
+    return true;
+  }
+
   if (!video_st)
     return false;
 
   switch (property_id) {
-  case CAP_PROP_FPS: {
-    this->fps = (int)value;
-  } break;
   case CAP_PROP_POS_MSEC:
   case CAP_PROP_POS_FRAMES:
   case CAP_PROP_POS_AVI_RATIO: {
