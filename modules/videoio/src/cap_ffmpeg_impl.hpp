@@ -919,11 +919,10 @@ bool CvCapture_FFMPEG::open( const char* _filename )
     {
         AVCodecContext* enc = ic->streams[i]->codec;
 
-//        enc->thread_count = get_number_of_cpus();
-        //by liuziangexit
-        //disable parallel encoding
+        // by liuziangexit
+        // disable parallel encoding
         enc->thread_count = 1;
-        fprintf(stdout, "OpenCV: FFMPEG: disabled multi-threading\n");
+        fprintf(stderr, "OpenCV: FFMPEG: multi-threading disabled\n");
 
         AVDictionaryEntry* avdiscard_entry = av_dict_get(dict, "avdiscard", NULL, 0);
 
@@ -1718,13 +1717,14 @@ static AVStream *icv_add_video_stream_FFMPEG(AVFormatContext *oc,
         c->codec_id = codec_id;
     }
 
-    //if(codec_tag) c->codec_tag=codec_tag;
-    //add by liuziangexit
-    //use omx
+    // add by liuziangexit
+    // use omx
     if (c->codec_id == AV_CODEC_ID_H264) {
       codec = avcodec_find_encoder_by_name(H264_OMX);
       if(!codec) {
-        fprintf(stdout, "OpenCV: FFMPEG: H264_OMX encoder not found\n");
+        fprintf(stderr, "OpenCV: FFMPEG: H264_OMX encoder not found\n");
+      }else{
+        fprintf(stderr, "OpenCV: FFMPEG: using H264_OMX encoder\n");
       }
     } else {
       codec = avcodec_find_encoder(c->codec_id);
@@ -2355,14 +2355,15 @@ bool CvVideoWriter_FFMPEG::open( const char * filename, int fourcc,
 
     c->codec_tag = fourcc;
     /* find the video encoder */
-    //by liuziangexit
-    //use omx
-    //AVCodec* codec = avcodec_find_encoder(c->codec_id);
+    // by liuziangexit
+    // use omx
     AVCodec* codec;
     if (c->codec_id == AV_CODEC_ID_H264) {
       codec = avcodec_find_encoder_by_name(H264_OMX);
       if(!codec) {
-        fprintf(stdout, "OpenCV: FFMPEG: H264_OMX encoder not found\n");
+        fprintf(stderr, "OpenCV: FFMPEG: H264_OMX encoder not found\n");
+      }else{
+        fprintf(stderr, "OpenCV: FFMPEG: using H264_OMX encoder\n");
       }
     } else {
       codec = avcodec_find_encoder(c->codec_id);
@@ -2378,10 +2379,10 @@ bool CvVideoWriter_FFMPEG::open( const char * filename, int fourcc,
     lbit_rate = std::min(lbit_rate, (int64_t)INT_MAX);
     c->bit_rate_tolerance = (int)lbit_rate;
     c->bit_rate = (int)lbit_rate;
-    //by liuziangexit
+    // by liuziangexit
     // disable parallel encoding
     c->thread_count = 1;
-    fprintf(stdout, "OpenCV: FFMPEG: disabled multi-threading\n");
+    fprintf(stderr, "OpenCV: FFMPEG: multi-threading disabled\n");
 
     /* open the codec */
     if ((err= avcodec_open2(c, codec, NULL)) < 0) {
