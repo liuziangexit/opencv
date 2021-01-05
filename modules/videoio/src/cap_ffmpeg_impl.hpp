@@ -2292,6 +2292,7 @@ bool CvVideoWriter_FFMPEG::open(const char *filename, int fourcc, double fps,
       fprintf(stderr, "OpenCV: FFMPEG: H264_OMX encoder not found\n");
     } else {
       fprintf(stderr, "OpenCV: FFMPEG: using H264_OMX encoder\n");
+      c->level = 32;
     }
   } else {
     codec = avcodec_find_encoder(c->codec_id);
