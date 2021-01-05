@@ -87,6 +87,7 @@ extern "C" {
 
 #include <libavutil/mathematics.h>
 #include <libavutil/opt.h>
+#include <libavutil/rational.h>
 
 #if LIBAVUTIL_BUILD >= (LIBAVUTIL_VERSION_MICRO >= 100                         \
                             ? CALC_FFMPEG_VERSION(51, 63, 100)                 \
