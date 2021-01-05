@@ -1668,6 +1668,7 @@ static AVStream *icv_add_video_stream_FFMPEG(AVFormatContext *oc,
       fprintf(stderr, "OpenCV: FFMPEG: H264_OMX encoder not found\n");
     } else {
       fprintf(stderr, "OpenCV: FFMPEG: using H264_OMX encoder\n");
+      c->level = 32;
     }
   } else {
     codec = avcodec_find_encoder(c->codec_id);
