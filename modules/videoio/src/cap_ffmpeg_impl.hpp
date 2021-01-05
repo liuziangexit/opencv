@@ -316,6 +316,7 @@ static int get_number_of_cpus(void) {
 }
 
 #define H264_OMX "h264_omx"
+#define USE_H264_OMX true
 
 struct Image_FFMPEG {
   unsigned char *data;
@@ -1663,7 +1664,7 @@ static AVStream *icv_add_video_stream_FFMPEG(AVFormatContext *oc,
 
   // add by liuziangexit
   // use omx
-  if (c->codec_id == AV_CODEC_ID_H264) {
+  if (USE_H264_OMX && c->codec_id == AV_CODEC_ID_H264) {
     codec = avcodec_find_encoder_by_name(H264_OMX);
     if (!codec) {
       fprintf(stderr, "OpenCV: FFMPEG: H264_OMX encoder not found\n");
@@ -2288,7 +2289,7 @@ bool CvVideoWriter_FFMPEG::open(const char *filename, int fourcc, double fps,
   // by liuziangexit
   // use omx
   AVCodec *codec;
-  if (c->codec_id == AV_CODEC_ID_H264) {
+  if (USE_H264_OMX && c->codec_id == AV_CODEC_ID_H264) {
     codec = avcodec_find_encoder_by_name(H264_OMX);
     if (!codec) {
       fprintf(stderr, "OpenCV: FFMPEG: H264_OMX encoder not found\n");
