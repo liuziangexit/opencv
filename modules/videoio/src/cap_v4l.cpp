@@ -557,10 +557,6 @@ bool CvCaptureCAM_V4L::autosetup_capture_mode_v4l2()
         }
     }
     __u32 try_order[] = {
-#ifdef HAVE_JPEG
-        V4L2_PIX_FMT_MJPEG,
-        V4L2_PIX_FMT_JPEG,
-#endif
             V4L2_PIX_FMT_BGR24,
             V4L2_PIX_FMT_RGB24,
             V4L2_PIX_FMT_YVU420,
@@ -573,6 +569,10 @@ bool CvCaptureCAM_V4L::autosetup_capture_mode_v4l2()
             V4L2_PIX_FMT_SBGGR8,
             V4L2_PIX_FMT_SGBRG8,
             V4L2_PIX_FMT_SN9C10X,
+#ifdef HAVE_JPEG
+            V4L2_PIX_FMT_MJPEG,
+            V4L2_PIX_FMT_JPEG,
+#endif
             V4L2_PIX_FMT_Y16,
             V4L2_PIX_FMT_Y12,
             V4L2_PIX_FMT_Y10,
