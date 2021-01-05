@@ -273,11 +273,11 @@ typedef uint32_t __u32;
 #endif
 
 /* Defaults - If your board can do better, set it here.  Set for the most common type inputs. */
-#define DEFAULT_V4L_WIDTH  640
-#define DEFAULT_V4L_HEIGHT 480
+#define DEFAULT_V4L_WIDTH  1280
+#define DEFAULT_V4L_HEIGHT 720
 #define DEFAULT_V4L_FPS 30
 
-#define MAX_CAMERAS 8
+#define MAX_CAMERAS 30
 
 // default and maximum number of V4L buffers, not including last, 'special' buffer
 #define MAX_V4L_BUFFERS 10
