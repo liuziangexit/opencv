@@ -316,7 +316,7 @@ static int get_number_of_cpus(void) {
 }
 
 #define H264_OMX "h264_omx"
-#define USE_H264_OMX true
+#define USE_H264_OMX false
 
 struct Image_FFMPEG {
   unsigned char *data;
