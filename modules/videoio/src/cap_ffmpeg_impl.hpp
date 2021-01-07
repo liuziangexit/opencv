@@ -1662,20 +1662,19 @@ static AVStream *icv_add_video_stream_FFMPEG(AVFormatContext *oc,
     c->codec_id = codec_id;
   }
 
-      // add by liuziangexit
-      // use omx
-      if (USE_H264_OMX && c->codec_id == AV_CODEC_ID_H264) {
+  // add by liuziangexit
+  // use omx
+  if (USE_H264_OMX && c->codec_id == AV_CODEC_ID_H264) {
     codec = avcodec_find_encoder_by_name(H264_OMX);
     if (!codec) {
       fprintf(stderr, "OpenCV: FFMPEG: H264_OMX encoder not found\n");
     } else {
       fprintf(stderr, "OpenCV: FFMPEG: using H264_OMX encoder\n");
-      c->level = 31;
+      c->level = 41;
       c->framerate = AVRational{30, 1};
       c->time_base = AVRational{30, 1};
     }
-  }
-  else {
+  } else {
     codec = avcodec_find_encoder(c->codec_id);
   }
 
@@ -2297,7 +2296,7 @@ bool CvVideoWriter_FFMPEG::open(const char *filename, int fourcc, double fps,
       fprintf(stderr, "OpenCV: FFMPEG: H264_OMX encoder not found\n");
     } else {
       fprintf(stderr, "OpenCV: FFMPEG: using H264_OMX encoder\n");
-      c->level = 31;
+      c->level = 41;
       c->framerate = AVRational{30, 1};
       c->time_base = AVRational{30, 1};
     }
