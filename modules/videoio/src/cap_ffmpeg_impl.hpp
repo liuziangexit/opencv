@@ -466,9 +466,6 @@ struct CvCapture_FFMPEG {
   double dts_to_sec(int64_t dts) const;
   void get_rotation_angle();
 
-  // by liuziangexit
-  int fps;
-
   AVFormatContext *ic;
   AVCodec *avcodec;
   int video_stream;
@@ -515,7 +512,6 @@ struct CvCapture_FFMPEG {
 
 void CvCapture_FFMPEG::init() {
   fprintf(stderr, "OpenCV: FFMPEG CAP: liuziang 20210104\n");
-  fps = -1;
   ic = 0;
   video_stream = -1;
   video_st = 0;
@@ -865,13 +861,6 @@ bool CvCapture_FFMPEG::open(const char *_filename) {
 #else
   av_dict_set(&dict, "rtsp_transport", "tcp", 0);
 #endif
-
-  // by liuziangexit
-  // setting fps
-  if (fps != -1) {
-    av_dict_set(&dict, "framerate", std::to_string(fps).c_str(), 0);
-  }
-
   AVInputFormat *input_format = NULL;
   AVDictionaryEntry *entry = av_dict_get(dict, "input_format", NULL, 0);
   if (entry != 0) {
@@ -1261,10 +1250,6 @@ bool CvCapture_FFMPEG::retrieveFrame(int, unsigned char **data, int *step,
 }
 
 double CvCapture_FFMPEG::getProperty(int property_id) const {
-  if (property_id == CAP_PROP_FPS && this->fps != -1) {
-    return this->fps;
-  }
-
   if (!video_st)
     return 0;
 
@@ -1360,7 +1345,7 @@ int64_t CvCapture_FFMPEG::get_bitrate() const { return ic->bit_rate / 1000; }
 double CvCapture_FFMPEG::get_fps() const {
 #if 0 && LIBAVFORMAT_BUILD >= CALC_FFMPEG_VERSION(55, 1, 100) &&               \
     LIBAVFORMAT_VERSION_MICRO >= 100
-    double fps = r2d(av_guess_frame_rate(ic, ic->streams[video_stream], NULL));
+  double fps = r2d(av_guess_frame_rate(ic, ic->streams[video_stream], NULL));
 #else
   double fps = r2d(ic->streams[video_stream]->avg_frame_rate);
 
@@ -1460,11 +1445,6 @@ void CvCapture_FFMPEG::seek(double sec) {
 }
 
 bool CvCapture_FFMPEG::setProperty(int property_id, double value) {
-  if (property_id == CAP_PROP_FPS) {
-    this->fps = (int)value;
-    return true;
-  }
-
   if (!video_st)
     return false;
 
@@ -1752,14 +1732,13 @@ static AVStream *icv_add_video_stream_FFMPEG(AVFormatContext *oc,
    and qmin since they will be set to reasonable defaults by the libx264
    preset system. Also, use a crf encode with the default quality rating,
    this seems easier than finding an appropriate default bitrate. */
-  /*
   if (c->codec_id == AV_CODEC_ID_H264) {
     c->gop_size = -1;
     c->qmin = -1;
     c->bit_rate = 0;
     if (c->priv_data)
-        av_opt_set(c->priv_data,"crf","23", 0);
-  }*/
+      av_opt_set(c->priv_data, "crf", "23", 0);
+  }
 
   // some formats want stream headers to be separate
   if (oc->oformat->flags & AVFMT_GLOBALHEADER) {
@@ -2297,8 +2276,8 @@ bool CvVideoWriter_FFMPEG::open(const char *filename, int fourcc, double fps,
     } else {
       fprintf(stderr, "OpenCV: FFMPEG: using H264_OMX encoder\n");
       c->level = 31;
-    /*  c->framerate = AVRational{1, 30};
-      c->time_base = AVRational{1, 30};*/
+      /*  c->framerate = AVRational{1, 30};
+        c->time_base = AVRational{1, 30};*/
     }
   } else {
     codec = avcodec_find_encoder(c->codec_id);
