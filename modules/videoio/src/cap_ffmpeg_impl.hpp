@@ -58,6 +58,8 @@ using namespace cv;
 #include <assert.h>
 #include <limits>
 #include <string>
+// for abort
+#include <stdlib.h>
 
 #ifndef __OPENCV_BUILD
 #define CV_FOURCC(c1, c2, c3, c4)                                              \
@@ -1770,6 +1772,61 @@ static const int OPENCV_NO_FRAMES_WRITTEN_CODE = 1000;
 
 static int icv_av_write_frame_FFMPEG(AVFormatContext *oc, AVStream *video_st,
                                      uint8_t *, uint32_t, AVFrame *picture) {
+  bool free_picture = false;
+  if (picture) {
+    AVFrame *frame = av_frame_alloc();
+    frame->format = picture->format;
+    frame->width = picture->width;
+    frame->height = picture->height;
+
+    /*
+       还不清楚为什么new一个avframe出来再把pic拷贝进去就没有那个绿条问题了
+
+       目前怀疑是跟内存对齐有关，需要用下面这段代码继续调试
+
+     1.手动给avframe供应buffer
+     2.把buffer改成不同的对齐，看看能不能出现绿条问题
+     3.如果是这样的话，改picture分配buffer那部分的代码
+
+    int len = av_image_get_buffer_size((enum AVPixelFormat)picture->format,
+                                           picture->width, picture->height, 0);
+    void *ptr = malloc(len);
+    if (!ptr) {
+      abort();
+    }
+    av_image_fill_arrays(frame->data, frame->linesize, (uint8_t *)ptr,
+                         (enum AVPixelFormat)picture->format, picture->width,
+                         picture->height, 0);*/
+
+    if (av_frame_get_buffer(frame, 0)) {
+      abort();
+    }
+
+    if (av_frame_copy(frame, picture) < 0) {
+      abort();
+    }
+
+    frame->pkt_dts = picture->pkt_dts;
+    frame->key_frame = picture->key_frame;
+    frame->coded_picture_number = picture->coded_picture_number;
+    frame->pkt_pos = picture->pkt_pos;
+    frame->pkt_duration = picture->pkt_duration;
+    frame->pkt_size = picture->pkt_size;
+    frame->color_range = picture->color_range;
+    frame->color_primaries = picture->color_primaries;
+    frame->color_trc = picture->color_trc;
+    frame->colorspace = picture->colorspace;
+    frame->chroma_location = picture->chroma_location;
+    frame->best_effort_timestamp = picture->best_effort_timestamp;
+    frame->pict_type = picture->pict_type;
+    frame->sample_aspect_ratio = picture->sample_aspect_ratio;
+    frame->pts = picture->pts;
+    frame->pkt_pts = picture->pkt_pts;
+    frame->display_picture_number = picture->display_picture_number;
+
+    picture = frame;
+    free_picture = true;
+  }
   AVCodecContext *c = video_st->codec;
   int ret = OPENCV_NO_FRAMES_WRITTEN_CODE;
 
@@ -1831,6 +1888,11 @@ static int icv_av_write_frame_FFMPEG(AVFormatContext *oc, AVStream *video_st,
       ret = OPENCV_NO_FRAMES_WRITTEN_CODE;
 #endif
   }
+  if (free_picture) {
+    av_frame_unref(picture);
+    av_frame_free(&picture);
+  }
+
   return ret;
 }
 
