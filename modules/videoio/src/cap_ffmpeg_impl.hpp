@@ -60,6 +60,7 @@ using namespace cv;
 #include <string>
 // for abort
 #include <stdlib.h>
+#include <string.h>
 
 #ifndef __OPENCV_BUILD
 #define CV_FOURCC(c1, c2, c3, c4)                                              \
@@ -1773,7 +1774,12 @@ static const int OPENCV_NO_FRAMES_WRITTEN_CODE = 1000;
 static int icv_av_write_frame_FFMPEG(AVFormatContext *oc, AVStream *video_st,
                                      uint8_t *, uint32_t, AVFrame *picture) {
   bool free_picture = false;
-  if (picture) {
+  int cmp_len = strlen("omx_h264");
+  cmp_len = strlen(oc->video_codec->name) > cmp_len
+                ? strlen(oc->video_codec->name)
+                : cmp_len;
+  int is_omx = memcmp(oc->video_codec, "omx_h264", cmp_len) == 0;
+  if (is_omx && picture) {
     AVFrame *frame = av_frame_alloc();
     frame->format = picture->format;
     frame->width = picture->width;
