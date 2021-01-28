@@ -1775,10 +1775,10 @@ static int icv_av_write_frame_FFMPEG(AVFormatContext *oc, AVStream *video_st,
                                      uint8_t *, uint32_t, AVFrame *picture) {
   bool free_picture = false;
   int cmp_len = strlen("omx_h264");
-  cmp_len = strlen(oc->video_codec->name) > cmp_len
-                ? strlen(oc->video_codec->name)
+  cmp_len = strlen(video_st->codec->codec->name) > cmp_len
+                ? strlen(video_st->codec->codec->name)
                 : cmp_len;
-  int is_omx = memcmp(oc->video_codec, "omx_h264", cmp_len) == 0;
+  int is_omx = memcmp(video_st->codec->codec->name, "omx_h264", cmp_len) == 0;
   if (is_omx && picture) {
     AVFrame *frame = av_frame_alloc();
     frame->format = picture->format;
